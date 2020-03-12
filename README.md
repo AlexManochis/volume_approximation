@@ -46,14 +46,11 @@ I generate a 100-dimensional hypercube and sample 1000 uniform points from it wi
 for (i in c(1, seq(10, 100, by = 10))){
   points = sample_points(P, n=num_of_points, random_walk = list("walk" = "BiW", "walk_length" = i))
   projected_points = data.frame( x=points[1,], y=points[2,] )
-  plot = ggplot(projected_points, aes(x=x, y=y))+geom_point()
+  plot = ggplot(projected_points, aes(x=x, y=y))+geom_point(color="red")
   plot_list[[i]] = plot
 }
-
-plot1 = ggplot(data.frame( x=points1[1,], y=points1[2,] ), aes(x=x, y=y))
-+geom_point(color="red")
-
 ```
+For the rest of the random walks I just change the color of the ploted points.
 
 Billiard walk  
 ![BiW1](R-proj/inst/gsoc20/BillW_cube100_points1000_1.png)
@@ -67,3 +64,44 @@ Billiard walk
 ![BiW80](R-proj/inst/gsoc20/BillW_cube100_points1000_80.png)
 ![BiW90](R-proj/inst/gsoc20/BillW_cube100_points1000_90.png)
 ![BiW100](R-proj/inst/gsoc20/BillW_cube100_points1000_100.png)
+
+Ball walk  
+![BaW1](R-proj/inst/gsoc20/BW_cube100_points1000_1.png)
+![BaW10](R-proj/inst/gsoc20/BW_cube100_points1000_10.png)
+![BaW20](R-proj/inst/gsoc20/BW_cube100_points1000_20.png)
+![BaW30](R-proj/inst/gsoc20/BW_cube100_points1000_30.png)
+![BaW40](R-proj/inst/gsoc20/BW_cube100_points1000_40.png)
+![BaW50](R-proj/inst/gsoc20/BW_cube100_points1000_50.png)
+![BaW60](R-proj/inst/gsoc20/BW_cube100_points1000_60.png)
+![BaW70](R-proj/inst/gsoc20/BW_cube100_points1000_70.png)
+![BaW80](R-proj/inst/gsoc20/BW_cube100_points1000_80.png)
+![BaW90](R-proj/inst/gsoc20/BW_cube100_points1000_90.png)
+![BaW100](R-proj/inst/gsoc20/BW_cube100_points1000_100.png)
+
+Random Directions Hit and Run  
+![BaW1](R-proj/inst/gsoc20/RDHR_cube100_points1000_1.png)
+![BaW10](R-proj/inst/gsoc20/RDHR_cube100_points1000_10.png)
+![BaW20](R-proj/inst/gsoc20/RDHR_cube100_points1000_20.png)
+![BaW30](R-proj/inst/gsoc20/RDHR_cube100_points1000_30.png)
+![BaW40](R-proj/inst/gsoc20/RDHR_cube100_points1000_40.png)
+![BaW50](R-proj/inst/gsoc20/RDHR_cube100_points1000_50.png)
+![BaW60](R-proj/inst/gsoc20/RDHR_cube100_points1000_60.png)
+![BaW70](R-proj/inst/gsoc20/RDHR_cube100_points1000_70.png)
+![BaW80](R-proj/inst/gsoc20/RDHR_cube100_points1000_80.png)
+![BaW90](R-proj/inst/gsoc20/RDHR_cube100_points1000_90.png)
+![BaW100](R-proj/inst/gsoc20/RDHR_cube100_points1000_100.png)
+
+Coordinate Directions Hit and Run  
+![BaW1](R-proj/inst/gsoc20/CDHR_cube100_points1000_1.png)
+![BaW10](R-proj/inst/gsoc20/CDHR_cube100_points1000_10.png)
+![BaW20](R-proj/inst/gsoc20/CDHR_cube100_points1000_20.png)
+![BaW30](R-proj/inst/gsoc20/CDHR_cube100_points1000_30.png)
+![BaW40](R-proj/inst/gsoc20/CDHR_cube100_points1000_40.png)
+![BaW50](R-proj/inst/gsoc20/CDHR_cube100_points1000_50.png)
+![BaW60](R-proj/inst/gsoc20/CDHR_cube100_points1000_60.png)
+![BaW70](R-proj/inst/gsoc20/CDHR_cube100_points1000_70.png)
+![BaW80](R-proj/inst/gsoc20/CDHR_cube100_points1000_80.png)
+![BaW90](R-proj/inst/gsoc20/CDHR_cube100_points1000_90.png)
+![BaW100](R-proj/inst/gsoc20/CDHR_cube100_points1000_100.png)
+
+Notice that Billard walk samples almost perfect uniformly distributed points. Ball walk and Random Directions Hit and Run converges with the same rate to the uniform distribution. Coordinate Directions Hit and Run is the worst for small walk length but as the walk length increases the sample becomes almost perfect.
