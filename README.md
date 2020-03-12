@@ -1,4 +1,4 @@
-## A. Tests for the project "A comparative study of uniform high dimensional samplers" in Google Summer of Code 2020
+## Tests for the project "A comparative study of uniform high dimensional samplers" in Google Summer of Code 2020
 
 ### 1. Easy  
 
