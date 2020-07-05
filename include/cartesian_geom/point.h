@@ -88,6 +88,10 @@ public:
 
     void set_to_origin() {
         coeffs.setZero(d);
+
+    void set_coeffs (const Coeff& coeffs2) {
+        d = coeffs2.rows();
+        coeffs = coeffs2;
     }
 
     FT operator[] (const unsigned int i) const
