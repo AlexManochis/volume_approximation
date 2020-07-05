@@ -60,6 +60,20 @@ public:
     int type;
 };
 
+class OrderPolytope {
+public:
+    OrderPolytope() {}
+    OrderPolytope(Rcpp::NumericMatrix _E, Rcpp::NumericMatrix _A) : E(_E), A(_A) {
+        dimension = _A.ncol();
+    }
+    int type = 5;
+    unsigned int dimension;
+    double vol = std::numeric_limits<double>::signaling_NaN();
+    Rcpp::NumericMatrix A;
+    Rcpp::NumericMatrix E;
+
+};
+
 
 RCPP_MODULE(polytopes){
     using namespace Rcpp ;
@@ -177,6 +191,19 @@ RCPP_MODULE(polytopes){
     .field( "volume", &VPinterVP::vol )
     .field( "dimension", &VPinterVP::dimension )
     .field( "type", &VPinterVP::type );
+
+    
+
+     class_<OrderPolytope>("OrderPolytope")
+        // expose the default constructor
+        .constructor()
+        .constructor<Rcpp::NumericMatrix, Rcpp::NumericMatrix>()
+
+        .field( "type", &OrderPolytope::type )
+        .field( "dimension", &OrderPolytope::dimension )
+        .field( "volume", &OrderPolytope::vol )
+        .field( "A", &OrderPolytope::A )
+        .field( "E", &OrderPolytope::E );
 }
 
 extern SEXP _rcpp_module_boot_polytopes(void);
