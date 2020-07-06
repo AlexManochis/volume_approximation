@@ -129,10 +129,13 @@ frustum_of_simplex <- function(a, z0) {
 #' @return A numerical matrix that describes the full dimensional polytope, a numerical matrix of the inverse linear transofmation that is applied on the input polytope, the numerical vector the the input polytope is shifted and the product of the singular values of the matrix of linear map applied on the input polytope.
 full_dimensional_polytope <- function(P) {
     .Call(`_volesti_full_dimensional_polytope`, P)
+}
 
 #' Internal rcpp function for the rounding of a convex polytope
 #'
 #' @param samples The point set.
+#' @param frac1 Optional.
+#' @param frac2 Optional. 
 #'
 #' @return A numerical matrix that describes the rounded polytope, a numerical matrix of the inverse linear transofmation that is applied on the input polytope, the numerical vector the the input polytope is shifted and the determinant of the matrix of the linear transformation that is applied on the input polytope.
 geweke <- function(samples, frac1 = NULL, frac2 = NULL) {
@@ -181,19 +184,19 @@ poly_gen <- function(kind_gen, Vpoly_gen, Zono_gen, dim_gen, m_gen, seed = NULL)
 #'
 #' @param samples The point set.
 #'
-#' @return A numerical matrix that describes the rounded polytope, a numerical matrix of the inverse linear transofmation that is applied on the input polytope, the numerical vector the the input polytope is shifted and the determinant of the matrix of the linear transformation that is applied on the input polytope.
-psrf <- function(samples, method = NULL) {
-    .Call(`_volesti_psrf`, samples, method)
+#' @return The value of PSRF diagnostic.
+psrf <- function(samples) {
+    .Call(`_volesti_psrf`, samples)
 }
 
 #'  An internal Rccp function for the random rotation of a convex polytope
 #'
 #' @param samples The sampled points from a geometric random walk.
+#' @param q Optional. The quantile of the quantity of interest. The default value is 0.025.
+#' @param r Optional. The level of precision desired. The default value is 0.01.
+#' @param s Optional. Thr probability associated with r. The default value is 0.95.
 #'
-#' @section warning:
-#' Do not use this function.
-#'
-#' @return A matrix that describes the rotated polytope
+#' @return (i) The number of draws required for burn-in, (i) the skip parameter for 1st-order Markov chain, (iii) the skip parameter sufficient to get independence chain, (iv) the number of draws required to achieve r precision, (v) the number of draws if the chain is white noise, (vi) the I-statistic from Raftery and Lewis (1992)
 raftery <- function(samples, q = NULL, r = NULL, s = NULL) {
     .Call(`_volesti_raftery`, samples, q, r, s)
 }

@@ -26,7 +26,7 @@ enum random_walks {ball_walk, rdhr, cdhr, billiard, dikin_walk, vaidya_walk, joh
 template <typename Polytope, typename RNGType, typename PointList, typename NT, typename Point>
 void sample_from_polytope(Polytope &P, RNGType &rng, PointList &randPoints, unsigned int const& walkL,
         unsigned int const& numpoints, bool const& gaussian, NT const& a, NT const& L, Point const& StartingPoint,
-        unsigned int const& nburns, bool const& set_L, random_walks walk)
+        unsigned int const& nburns, bool const& set_L, random_walks walk, int const &type)
 {
     switch (walk)
     {
@@ -84,7 +84,7 @@ void sample_from_polytope(Polytope &P, RNGType &rng, PointList &randPoints, unsi
         }
         break;
     case billiard:
-        if (type == 1) {
+        if (type) {
             if (set_L) {
                 AcceleratedBilliardWalk WalkType(L);
                 uniform_sampling(randPoints, P, rng, WalkType, walkL, numpoints, StartingPoint, nburns);
@@ -96,9 +96,10 @@ void sample_from_polytope(Polytope &P, RNGType &rng, PointList &randPoints, unsi
             if (set_L) {
                 BilliardWalk WalkType(L);
                 uniform_sampling(randPoints, P, rng, WalkType, walkL, numpoints, StartingPoint, nburns);
-        } else {
+            } else {
             uniform_sampling<BilliardWalk>(randPoints, P, rng, walkL, numpoints,
                      StartingPoint, nburns);
+            }
         }
         break;
     case ball_walk:
@@ -417,43 +418,23 @@ Rcpp::NumericMatrix sample_points(Rcpp::Nullable<Rcpp::Reference> P,
 
     switch (type) {
         case 1: {
-<<<<<<< HEAD
-            sample_from_polytope(HP, type, rng, randPoints, walkL, numpoints, gaussian, a, L, boundary, StartingPoint, nburns,
-                   set_L, cdhr, rdhr, billiard, ball_walk);
-            break;
-        }
-        case 2: {
-            sample_from_polytope(VP, type, rng, randPoints, walkL, numpoints, gaussian, a, L, boundary, StartingPoint, nburns,
-                                 set_L, cdhr, rdhr, billiard, ball_walk);
-            break;
-        }
-        case 3: {
-            sample_from_polytope(ZP, type, rng, randPoints, walkL, numpoints, gaussian, a, L, boundary, StartingPoint, nburns,
-                                 set_L, cdhr, rdhr, billiard, ball_walk);
-            break;
-        }
-        case 4: {
-            sample_from_polytope(VPcVP, type, rng, randPoints, walkL, numpoints, gaussian, a, L, boundary, StartingPoint, nburns,
-                                 set_L, cdhr, rdhr, billiard, ball_walk);
-=======
             sample_from_polytope(HP, rng, randPoints, walkL, numpoints, gaussian, a, L, StartingPoint, nburns,
-                                 set_L, walk);
+                                 set_L, walk, type);
             break;
         }
         case 2: {
             sample_from_polytope(VP, rng, randPoints, walkL, numpoints, gaussian, a, L, StartingPoint, nburns,
-                                 set_L, walk);
+                                 set_L, walk, type);
             break;
         }
         case 3: {
             sample_from_polytope(ZP, rng, randPoints, walkL, numpoints, gaussian, a, L, StartingPoint, nburns, 
-                                 set_L, walk);
+                                 set_L, walk, type);
             break;
         }
         case 4: {
             sample_from_polytope(VPcVP, rng, randPoints, walkL, numpoints, gaussian, a, L, StartingPoint, nburns,
-                                 set_L, walk);
->>>>>>> ellipsoid_uniform
+                                 set_L, walk, type);
             break;
         }
     }

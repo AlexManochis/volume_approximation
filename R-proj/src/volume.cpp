@@ -39,7 +39,6 @@ double generic_volume(Polytope& P, RNGType &rng, unsigned int walk_length, NT e,
 
     if (rounding) {
         std::pair<Point, NT> InnerBall = P.ComputeInnerBall();
-
         if (type == 1) {
             round_val = round_polytope<CDHRWalk, MT, VT>(P, InnerBall, 10 + 10 * n, rng).second;
         } else {
