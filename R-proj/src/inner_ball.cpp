@@ -61,6 +61,7 @@ Rcpp::NumericVector inner_ball(Rcpp::Reference P,
                 break;
             } else if(mthd.compare(std::string("ipm")) == 0) {
                 NT tol = 0.00000001;
+                HP.normalize();
                 std::pair<VT, NT> res = compute_max_inner_ball(HP.get_mat(), HP.get_vec(), 150, tol);
                 InnerBall.second = res.second;
                 InnerBall.first = Point(res.first);
