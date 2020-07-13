@@ -272,13 +272,13 @@ public:
         return line_positive_intersect(r, v);//, Ar, Av);
     }
 
-    //------------------------------------------------------------------------------//
+    //------------------------------accelarated billiard------------------------------//
     template <typename update_parameters>
     std::pair<NT, int> line_first_positive_intersect(Point const& r,
                                                      Point const& v,
                                                      VT& Ar,
                                                      VT& Av,
-                                                     update_parameters &params) const
+                                                     update_parameters& params) const
     {
         return line_positive_intersect(r, v);
     }
@@ -290,7 +290,7 @@ public:
                                                VT& Av,
                                                NT const& lambda_prev,
                                                MT const& AA,
-                                               update_parameters &params) const
+                                               update_parameters& params) const
     {
         return line_positive_intersect(r, v);
     }
@@ -301,7 +301,7 @@ public:
                                                VT& Ar,
                                                VT& Av,
                                                NT const& lambda_prev,
-                                               update_parameters &params) const
+                                               update_parameters& params) const
     {
         return line_positive_intersect(r, v);
     }
