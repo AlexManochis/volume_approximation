@@ -116,13 +116,13 @@ struct hmc_exponential
                 std::pair<NT, int> pbpair = P.quadratic_positive_intersect(_p, _v, _Ac, _c, _Temp, _lambdas, _Av,
                                                                            _lambda_prev, _update_params);
                 if (T <= pbpair.first) {
-                    _p += (T * _v - ((T*T)/(2*_Temp)) * _c);
+                    _p += ((T * _v) - ((T*T)/(2*_Temp)) * _c);
                     _lambda_prev = T;
                     return;
                 }
 
                 _lambda_prev = dl * pbpair.first;
-                _p += (_lambda_prev * _v - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
+                _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
                 T -= _lambda_prev;
                 P.compute_reflection(_v, _c, _Temp, _lambda_prev,_update_params);
                 it++;
@@ -133,12 +133,12 @@ struct hmc_exponential
                             = P.quadratic_positive_intersect(_p, _v, _Ac, _c, _Temp, _lambdas, _Av, _lambda_prev, _AA,
                                                              _update_params);
                     if (T <= pbpair.first) {
-                        _p += (T * _v - ((T*T)/(2*_Temp)) * _c);
+                        _p += ((T * _v) - ((T*T)/(2*_Temp)) * _c);
                         _lambda_prev = T;
                         break;
                     }
                     _lambda_prev = dl * pbpair.first;
-                    _p += (_lambda_prev * _v - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
+                    _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
                     T -= _lambda_prev;
                     P.compute_reflection(_v, _c, _Temp, _lambda_prev, _update_params);
                     it++;
@@ -178,12 +178,12 @@ struct hmc_exponential
             std::pair<NT, int> pbpair
                     = P.quadratic_first_positive_intersect(_p, _v, _Ac, _c, _Temp, _lambdas, _Av, _update_params);
             if (T <= pbpair.first) {
-                _p += (T * _v - ((T*T)/(2.0*_Temp)) * _c);
+                _p += ((T * _v) - ((T*T)/(2.0*_Temp)) * _c);
                 _lambda_prev = T;
                 return;
             }
             _lambda_prev = dl * pbpair.first;
-            _p += (_lambda_prev * _v - ((_lambda_prev*_lambda_prev)/(2*_Temp)) * _c);
+            _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
             T -= _lambda_prev;
             P.compute_reflection(_v, _c, _Temp, _lambda_prev, _update_params);
 
@@ -193,16 +193,16 @@ struct hmc_exponential
                         = P.quadratic_positive_intersect(_p, _v, _Ac, _c, _Temp, _lambdas, _Av, _lambda_prev, 
                                                          _AA, _update_params);
                 if (T <= pbpair.first) {
-                    _p += (T * _v);
+                    _p += ((T * _v) - ((T*T)/(2.0*_Temp)) * _c);
                     _lambda_prev = T;
                     break;
                 } else if (it == 100*n) {
                     _lambda_prev = rng.sample_urdist() * pbpair.first;
-                    _p += (_lambda_prev * _v);
+                    _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
                     break;
                 }
                 _lambda_prev = dl * pbpair.first;
-                _p += (_lambda_prev * _v);
+                _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
                 T -= _lambda_prev;
                 P.compute_reflection(_v, _c, _Temp, _lambda_prev, _update_params);
                 it++;

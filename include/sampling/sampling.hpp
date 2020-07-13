@@ -224,7 +224,7 @@ template <typename WalkTypePolicy,
 void exponential_sampling(PointList &randPoints,
                    Polytope &P,
                    const VT &c,
-                   const NT& T,
+                   const NT &T,
                    RandomNumberGenerator &rng,
                    const unsigned int &walk_len,
                    const unsigned int &rnum,
@@ -243,11 +243,11 @@ void exponential_sampling(PointList &randPoints,
 
     Point p = starting_point;
 
-    typedef RandomPointGenerator <walk> RandomPointGenerator;
-    RandomPointGenerator::apply(P, p, c, nburns, walk_len, randPoints,
+    typedef ExponentialRandomPointGenerator <walk> RandomPointGenerator;
+    RandomPointGenerator::apply(P, p, c, T, nburns, walk_len, randPoints,
                                 push_back_policy, rng);
     randPoints.clear();
-    RandomPointGenerator::apply(P, p, c, rnum, walk_len, randPoints,
+    RandomPointGenerator::apply(P, p, c, T, rnum, walk_len, randPoints,
                                 push_back_policy, rng);
 }
 

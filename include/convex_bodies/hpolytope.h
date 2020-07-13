@@ -663,11 +663,13 @@ public:
             Av_data++;
             sum_nom_data++;
         }
-        int j =  params.facet_prev;
-        if ( Ar(j) + Av(j) * min_plus - ((min_plus * min_plus) / (2.0 * T)) * Ac(j) > b(j)){
-            alpha = -(Ac(j) / (2.0 * T));
-            Delta = Av(j) * Av(j) - 4.0 * alpha * (Ar(j) - b(j));
-            min_plus = (- Av(j) + std::sqrt(Delta)) / (2.0 * alpha);
+        int k =  params.facet_prev;
+        if ( Ar(k) + Av(k) * min_plus - ((min_plus * min_plus) / (2.0 * T)) * Ac(k) > b(k)){
+            facet = k;
+            params.inner_vi_ak = Av(k);
+            alpha = -(Ac(k) / (2.0 * T));
+            Delta = Av(k) * Av(k) - 4.0 * alpha * (Ar(k) - b(k));
+            min_plus = (- Av(k) + std::sqrt(Delta)) / (2.0 * alpha);
         }
 
         params.facet_prev = facet;
@@ -802,6 +804,14 @@ public:
     void compute_reflection(Point &v, const Point &, update_parameters const& params) const {
 
             Point a((-2.0 * params.inner_vi_ak) * A.row(params.facet_prev));
+            v += a;
+    }
+
+    template <typename update_parameters>
+    void compute_reflection(Point &v, VT const &c, NT const&T, NT const &t,
+                            update_parameters const& params) const {
+
+            Point a((-t / T) * c  + (-2.0 * params.inner_vi_ak) * A.row(params.facet_prev));
             v += a;
     }
 

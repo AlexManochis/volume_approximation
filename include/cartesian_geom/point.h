@@ -124,11 +124,27 @@ public:
         return temp;
     }
 
+    point operator+ (const Coeff& p) const
+    {
+        point temp;
+        temp.d = d;
+        temp.coeffs = coeffs + p;
+        return temp;
+    }
+
     point operator- (const point& p) const
     {
         point temp;
         temp.d = d;
         temp.coeffs = coeffs - p.getCoefficients();
+        return temp;
+    }
+
+    point operator- (const Coeff& p) const
+    {
+        point temp;
+        temp.d = d;
+        temp.coeffs = coeffs - p;
         return temp;
     }
 
