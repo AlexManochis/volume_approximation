@@ -513,8 +513,169 @@ public:
     //-----------------------------------------------------------------------------------//
 
 
-    //First coordinate ray intersecting convex polytope
+    //-------------------------------exponential hmc---------------------------------
+    // compute intersection point of a ray starting from r and pointing to v
+    // with polytope discribed by A and b
+    template <typename update_parameters>
+    std::pair<NT, int> quadratic_first_positive_intersect(Point const& r,
+                                                     Point const& v,
+                                                     VT const &Ac,
+                                                     VT const &c,
+                                                     NT const &T,
+                                                     VT& Ar,
+                                                     VT& Av,
+                                                     update_parameters &params) const
+    {
+        NT lamda = 0, min_plus = NT(maxNT), Delta, alpha;
+        VT sum_nom;
+        //unsigned int i, j;
+        unsigned int j;
+        int m = num_of_hyperplanes(), facet;
+        //viterator rit, vit, Ariter = Ar.begin(), Aviter = Av.begin();
 
+        Ar.noalias() = A * r.getCoefficients();
+        sum_nom.noalias() = Ar - b;
+        Av.noalias() = A * v.getCoefficients();
+
+        NT* Av_data = Av.data();
+        NT* sum_nom_data = sum_nom.data();
+
+        for (int i = 0; i < m; i++) {
+            if (*Av_data == NT(0)) {
+                //std::cout<<"div0"<<std::endl;
+                ;
+            } else {
+                alpha = -(Ac(i) / (2.0 * T));
+                Delta = (*Av_data) * (*Av_data) - 4.0 * alpha * (*sum_nom_data);
+                lamda = (- (*Av_data) + std::sqrt(Delta)) / (2.0 * alpha);     // *sum_nom_data / *Av_data;
+                if (lamda < min_plus && lamda > 0) {
+                    min_plus = lamda;
+                    //if (pos){
+                    facet = i;
+                    //facet_k = i;
+                    params.inner_vi_ak = *Av_data;
+                    //}
+                }
+            }
+
+            Av_data++;
+            sum_nom_data++;
+        }
+        params.facet_prev = facet;
+        return std::pair<NT, int>(min_plus, facet);
+        //return line_intersect(r, v, Ar, Av, lambda_prev, true);
+    }
+
+
+    template <typename update_parameters>
+    std::pair<NT, int> quadratic_positive_intersect(Point const& r,
+                                               Point const& v,
+                                               VT const &Ac,
+                                               VT const &c,
+                                               NT const &T,
+                                               VT& Ar,
+                                               VT& Av,
+                                               NT const& lambda_prev,
+                                               update_parameters &params) const
+    {
+        NT lamda = 0, min_plus = NT(maxNT), Delta, alpha;
+        VT sum_nom;
+        unsigned int j;
+        int m = num_of_hyperplanes(), facet;
+
+        Ar.noalias() += lambda_prev * Av - ((lambda_prev*lambda_prev)/(2.0*T)) * c;
+        sum_nom.noalias() = Ar - b;
+        Av.noalias() = A * v.getCoefficients();
+
+        NT* sum_nom_data = sum_nom.data();
+        NT* Av_data = Av.data();
+
+        for (int i = 0; i < m; i++) {
+            if (*Av_data == NT(0)) {
+                //std::cout<<"div0"<<std::endl;
+                ;
+            } else {
+                alpha = -(Ac(i) / (2.0 * T));
+                Delta = (*Av_data) * (*Av_data) - 4.0 * alpha * (*sum_nom_data);
+                lamda = (- (*Av_data) + std::sqrt(Delta)) / (2.0 * alpha);
+                //lamda = *sum_nom_data / *Av_data;
+                if (lamda < min_plus && lamda > 0) {
+                    min_plus = lamda;
+                    facet = i;
+                    //facet_k = i;
+                    params.inner_vi_ak = *Av_data;
+                }
+            }
+            Av_data++;
+            sum_nom_data++;
+        }
+        params.facet_prev = facet;
+        return std::pair<NT, int>(min_plus, facet);
+    }
+
+
+    template <typename update_parameters>
+    std::pair<NT, int> quadratic_positive_intersect(Point const& r,
+                                                     Point const& v,
+                                                     VT const &Ac,
+                                                     VT const &c,
+                                                     NT const &T,
+                                                     VT& Ar,
+                                                     VT& Av,
+                                                     NT const& lambda_prev,
+                                                     MT const& AA,
+                                                     update_parameters &params) const
+    {
+        NT lamda = 0, min_plus = NT(maxNT), Delta, alpha;
+        VT sum_nom;//
+        // , sum_denom, sum2;
+        //unsigned int i, j;
+        unsigned int j;
+        int m = num_of_hyperplanes(), facet;
+        NT inner_prev = params.inner_vi_ak;
+        
+        Ar.noalias() += lambda_prev * Av - ((lambda_prev * lambda_prev)/(2.0*T)) * c;
+        
+        Av.noalias() += (-lambda_prev / T) * Ac + (-2.0 * inner_prev) * AA.col(params.facet_prev);
+            //sum2 = (-2.0 * inner_prev) * ((*Ariter)/params.ball_inner_norm);
+        
+        sum_nom.noalias() = Ar - b;
+
+        NT* sum_nom_data = sum_nom.data();
+        NT* Av_data = Av.data();
+
+        for (int i = 0; i < m; i++) {
+            if (*Av_data == NT(0) || params.facet_prev == i) {
+                //std::cout<<"div0"<<std::endl;
+                ;
+            } else {
+                alpha = -(Ac(i) / (2.0 * T));
+                Delta = (*Av_data) * (*Av_data) - 4.0 * alpha * (*sum_nom_data);
+                lamda = (- (*Av_data) + std::sqrt(Delta)) / (2.0 * alpha);
+                //lamda = *sum_nom_data / *Av_data;
+                if (lamda < min_plus && lamda > 0) {
+                    min_plus = lamda;
+                    facet = i;
+                    //facet_k = i;
+                    params.inner_vi_ak = *Av_data;
+                }
+            }
+            Av_data++;
+            sum_nom_data++;
+        }
+        int j =  params.facet_prev;
+        if ( Ar(j) + Av(j) * min_plus - ((min_plus * min_plus) / (2.0 * T)) * Ac(j) > b(j)){
+            alpha = -(Ac(j) / (2.0 * T));
+            Delta = Av(j) * Av(j) - 4.0 * alpha * (Ar(j) - b(j));
+            min_plus = (- Av(j) + std::sqrt(Delta)) / (2.0 * alpha);
+        }
+
+        params.facet_prev = facet;
+        return std::pair<NT, int>(min_plus, facet);
+    }
+
+
+    //First coordinate ray intersecting convex polytope
     std::pair<NT,NT> line_intersect_coord(Point const& r,
                                           unsigned int const& rand_coord,
                                           VT& lamdas) const
