@@ -163,9 +163,10 @@ Rcpp::NumericMatrix sample_points(Rcpp::Nullable<Rcpp::Reference> P,
     InterVP VPcVP;
 
     unsigned int numpoints, nburns = 0;
-    NT radius = 1.0, L;
+    NT radius = 1.0, L, T = 1.0;
     bool set_mode = false, cdhr = false, rdhr = false, ball_walk = false, gaussian = false,
-          billiard = false, boundary = false, set_starting_point = false, set_L = false;
+          billiard = false, exponential_hmc = false, boundary = false, set_starting_point = false, set_L = false;
+    VT c(dim); 
     std::list<Point> randPoints;
     std::pair<Point, NT> InnerBall;
     Point mode(dim);
@@ -244,11 +245,20 @@ Rcpp::NumericMatrix sample_points(Rcpp::Nullable<Rcpp::Reference> P,
         if (gaussian) throw Rcpp::exception("Gaussian sampling from the boundary is not supported!");
         rdhr = true;
         boundary = true;
-    }else if (Rcpp::as<std::string>(Rcpp::as<Rcpp::List>(random_walk)["walk"]).compare(std::string("BCDHR")) == 0) {
+    } else if (Rcpp::as<std::string>(Rcpp::as<Rcpp::List>(random_walk)["walk"]).compare(std::string("BCDHR")) == 0) {
         if (gaussian) throw Rcpp::exception("Gaussian sampling from the boundary is not supported!");
         cdhr = true;
         boundary = true;
-    }else {
+    } else if (Rcpp::as<std::string>(Rcpp::as<Rcpp::List>(random_walk)["walk"]).compare(std::string("hmc")) == 0) {
+        exponential_hmc = true;
+        c(0) = 1.0;
+        if (Rcpp::as<Rcpp::List>(random_walk).containsElementNamed("Temperature")) {
+            T = Rcpp::as<NT>(Rcpp::as<Rcpp::List>(random_walk)["Temperature"]);
+        }
+        if (Rcpp::as<Rcpp::List>(random_walk).containsElementNamed("objective")) {
+            c = Rcpp::as<VT>(Rcpp::as<Rcpp::List>(random_walk)["objective"]);
+        }
+    } else {
         throw Rcpp::exception("Unknown walk type!");
     }
 
@@ -293,6 +303,18 @@ Rcpp::NumericMatrix sample_points(Rcpp::Nullable<Rcpp::Reference> P,
                 throw Rcpp::exception("The given point is not in the interior of the polytope!");
             }
             HP.normalize();
+            if (exponential_hmc) {
+                exponential_sampling<hmc_exponential>(randPoints, HP, c, T, rng, walkL, numpoints,
+                                             StartingPoint, nburns);
+                MT RetMat(dim, numpoints);
+                unsigned int jj = 0;
+
+                for (typename std::list<Point>::iterator rpit = randPoints.begin(); rpit!=randPoints.end(); rpit++, jj++) {   
+                    RetMat.col(jj) = (*rpit).getCoefficients();
+                }
+                return Rcpp::wrap(RetMat);
+            }
+
             if (gaussian) {
                 StartingPoint = StartingPoint - mode;
                 HP.shift(mode.getCoefficients());

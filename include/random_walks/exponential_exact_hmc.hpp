@@ -61,10 +61,11 @@ struct hmc_exponential
     {
         typedef typename Polytope::PointType Point;
         typedef typename Polytope::MT MT;
+        typedef typename Polytope::VT VT;
         typedef typename Point::FT NT;
 
         template <typename GenericPolytope>
-        Walk(GenericPolytope const& P, Point const& p, Point const& c, NT const& Temp, RandomNumberGenerator &rng)
+        Walk(GenericPolytope const& P, Point const& p, VT const& c, NT const& Temp, RandomNumberGenerator &rng)
         {
             _update_params = update_parameters();
            _L = compute_diameter<GenericPolytope>
@@ -77,7 +78,7 @@ struct hmc_exponential
         }
 
         template <typename GenericPolytope>
-        Walk(GenericPolytope const& P, Point const& p, Point const& c, NT const& Temp, RandomNumberGenerator &rng,
+        Walk(GenericPolytope const& P, Point const& p, VT const& c, NT const& Temp, RandomNumberGenerator &rng,
              parameters const& params)
         {
             _update_params = update_parameters();
@@ -214,10 +215,10 @@ struct hmc_exponential
         NT _lambda_prev, _Temp;
         MT _AA;
         update_parameters _update_params;
-        typename Point::Coeff _lambdas;
-        typename Point::Coeff _Av;
-        typename Point::Coeff _c;
-        typename Point::Coeff _Ac;
+        VT _lambdas;
+        VT _Av;
+        VT _c;
+        VT _Ac;
     };
 
 };
