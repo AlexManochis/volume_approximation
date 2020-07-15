@@ -244,9 +244,9 @@ void exponential_sampling(PointList &randPoints,
     Point p = starting_point;
 
     typedef ExponentialRandomPointGenerator <walk> RandomPointGenerator;
-    RandomPointGenerator::apply(P, p, c, T, nburns, walk_len, randPoints,
-                                push_back_policy, rng);
-    randPoints.clear();
+    //RandomPointGenerator::apply(P, p, c, T, nburns, walk_len, randPoints,
+    //                            push_back_policy, rng);
+    //randPoints.clear();
     RandomPointGenerator::apply(P, p, c, T, rnum, walk_len, randPoints,
                                 push_back_policy, rng);
 }

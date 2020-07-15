@@ -583,7 +583,7 @@ public:
         unsigned int j;
         int m = num_of_hyperplanes(), facet;
 
-        Ar.noalias() += lambda_prev * Av - ((lambda_prev*lambda_prev)/(2.0*T)) * c;
+        Ar.noalias() += lambda_prev * Av - ((lambda_prev*lambda_prev)/(2.0*T)) * Ac;
         sum_nom.noalias() = Ar - b;
         Av.noalias() = A * v.getCoefficients();
 
@@ -634,7 +634,7 @@ public:
         int m = num_of_hyperplanes(), facet;
         NT inner_prev = params.inner_vi_ak;
         
-        Ar.noalias() += lambda_prev * Av - ((lambda_prev * lambda_prev)/(2.0*T)) * c;
+        Ar.noalias() += lambda_prev * Av - ((lambda_prev * lambda_prev)/(2.0*T)) * Ac;
         
         Av.noalias() += (-lambda_prev / T) * Ac + (-2.0 * inner_prev) * AA.col(params.facet_prev);
             //sum2 = (-2.0 * inner_prev) * ((*Ariter)/params.ball_inner_norm);
@@ -663,14 +663,15 @@ public:
             Av_data++;
             sum_nom_data++;
         }
-        int k =  params.facet_prev;
-        if ( Ar(k) + Av(k) * min_plus - ((min_plus * min_plus) / (2.0 * T)) * Ac(k) > b(k)){
-            facet = k;
-            params.inner_vi_ak = Av(k);
-            alpha = -(Ac(k) / (2.0 * T));
-            Delta = Av(k) * Av(k) - 4.0 * alpha * (Ar(k) - b(k));
-            min_plus = (- Av(k) + std::sqrt(Delta)) / (2.0 * alpha);
-        }
+        //int k =  params.facet_prev;
+        //if ( Ar(k) + Av(k) * min_plus - ((min_plus * min_plus) / (2.0 * T)) * Ac(k) > b(k)){
+        //    std::cout<<"hello_out"<<std::endl;
+        //    facet = k;
+        //    params.inner_vi_ak = Av(k);
+        //    alpha = -(Ac(k) / (2.0 * T));
+        //    Delta = Av(k) * Av(k) - 4.0 * alpha * (Ar(k) - b(k));
+        //    min_plus = (- Av(k) + std::sqrt(Delta)) / (2.0 * alpha);
+        //}
 
         params.facet_prev = facet;
         return std::pair<NT, int>(min_plus, facet);
@@ -808,9 +809,10 @@ public:
     }
 
     template <typename update_parameters>
-    void compute_reflection(Point &v, VT const &c, NT const&T, NT const &t,
-                            update_parameters const& params) const {
+    void compute_reflection(Point &v, VT const &c, NT const&T, VT const &Ac, NT const &t,
+                            update_parameters &params) const {
 
+            params.inner_vi_ak += -(Ac(params.facet_prev) * t ) / T;
             Point a((-t / T) * c  + (-2.0 * params.inner_vi_ak) * A.row(params.facet_prev));
             v += a;
     }

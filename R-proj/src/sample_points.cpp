@@ -304,6 +304,8 @@ Rcpp::NumericMatrix sample_points(Rcpp::Nullable<Rcpp::Reference> P,
             }
             HP.normalize();
             if (exponential_hmc) {
+                std::cout<<"c = "<<c.transpose()<<std::endl;
+                std::cout<<"Temperature = "<<T<<std::endl;
                 exponential_sampling<hmc_exponential>(randPoints, HP, c, T, rng, walkL, numpoints,
                                              StartingPoint, nburns);
                 MT RetMat(dim, numpoints);

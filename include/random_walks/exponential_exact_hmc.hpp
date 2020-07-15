@@ -102,7 +102,7 @@ struct hmc_exponential
                           RandomNumberGenerator &rng)
         {
             unsigned int n = P.dimension();
-            NT T = -std::log(rng.sample_urdist()) * _L;
+            NT T = rng.sample_urdist() * _L;
             const NT dl = 0.995;
             int it;
 
@@ -115,16 +115,19 @@ struct hmc_exponential
                 it = 0;
                 std::pair<NT, int> pbpair = P.quadratic_positive_intersect(_p, _v, _Ac, _c, _Temp, _lambdas, _Av,
                                                                            _lambda_prev, _update_params);
+                std::cout<<"it = "<<it<<", t = "<<pbpair.first<<", T ="<<T<<std::endl;
                 if (T <= pbpair.first) {
-                    _p += ((T * _v) - ((T*T)/(2*_Temp)) * _c);
+                    _p += ((T * _v) - (((T*T)/(2*_Temp)) * _c));
+                    std::cout<<"_v = "<<_v.getCoefficients().transpose()<<"\n"<<std::endl;
+                    std::cout<<"_p = "<<_p.getCoefficients().transpose()<<"\n"<<std::endl;
                     _lambda_prev = T;
-                    return;
+                    continue;
                 }
 
                 _lambda_prev = dl * pbpair.first;
-                _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
+                _p += ((_lambda_prev * _v) - (((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c));
                 T -= _lambda_prev;
-                P.compute_reflection(_v, _c, _Temp, _lambda_prev,_update_params);
+                P.compute_reflection(_v, _c, _Temp, _Ac, _lambda_prev,_update_params);
                 it++;
 
                 while (it < 100*n)
@@ -132,18 +135,24 @@ struct hmc_exponential
                     std::pair<NT, int> pbpair
                             = P.quadratic_positive_intersect(_p, _v, _Ac, _c, _Temp, _lambdas, _Av, _lambda_prev, _AA,
                                                              _update_params);
+                    std::cout<<"it = "<<it<<", t = "<<pbpair.first<<", T ="<<T<<std::endl;
                     if (T <= pbpair.first) {
-                        _p += ((T * _v) - ((T*T)/(2*_Temp)) * _c);
+                        _p += ((T * _v) - (((T*T)/(2.0*_Temp)) * _c));
+                        std::cout<<"_v = "<<_v.getCoefficients().transpose()<<"\n"<<std::endl;
+                        std::cout<<"_p = "<<_p.getCoefficients().transpose()<<"\n"<<std::endl;
                         _lambda_prev = T;
                         break;
                     }
                     _lambda_prev = dl * pbpair.first;
-                    _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
+                    _p += ((_lambda_prev * _v) - (((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c));
                     T -= _lambda_prev;
-                    P.compute_reflection(_v, _c, _Temp, _lambda_prev, _update_params);
+                    P.compute_reflection(_v, _c, _Temp, _Ac, _lambda_prev, _update_params);
                     it++;
                 }
-                if (it == 100*n) _p = p0;
+                if (it == 100*n){
+                    std::cout<<"limit reached"<<std::endl;
+                    _p = p0;
+                }
             }
             p = _p;
         }
@@ -171,29 +180,37 @@ struct hmc_exponential
             _p = p;
             _v = GetDirection<Point>::apply(n, rng);
 
-            NT T = -std::log(rng.sample_urdist()) * _L;
+            NT T = rng.sample_urdist() * _L;
             Point p0 = _p;
             int it = 0;
+            std::cout<<"_c = "<<_c.transpose()<<", Temperature = "<<_Temp<<std::endl;
 
             std::pair<NT, int> pbpair
                     = P.quadratic_first_positive_intersect(_p, _v, _Ac, _c, _Temp, _lambdas, _Av, _update_params);
+            std::cout<<"t first = "<<pbpair.first<<", T ="<<T<<std::endl;
+            std::cout<<"is_in = "<<P.is_in(_p + (((pbpair.first*0.9) * _v) - ((pbpair.first*0.9*pbpair.first*0.9)/(2.0*_Temp)) * _c));
             if (T <= pbpair.first) {
                 _p += ((T * _v) - ((T*T)/(2.0*_Temp)) * _c);
+                std::cout<<"_v = "<<_v.getCoefficients().transpose()<<"\n"<<std::endl;
+                std::cout<<"_p = "<<_p.getCoefficients().transpose()<<"\n"<<std::endl;
                 _lambda_prev = T;
                 return;
             }
             _lambda_prev = dl * pbpair.first;
             _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
             T -= _lambda_prev;
-            P.compute_reflection(_v, _c, _Temp, _lambda_prev, _update_params);
+            P.compute_reflection(_v, _c, _Temp, _Ac, _lambda_prev, _update_params);
 
             while (it < 100*n)
             {
                 std::pair<NT, int> pbpair
                         = P.quadratic_positive_intersect(_p, _v, _Ac, _c, _Temp, _lambdas, _Av, _lambda_prev, 
                                                          _AA, _update_params);
+                std::cout<<"it = "<<it<<", t = "<<pbpair.first<<", T ="<<T<<std::endl;
                 if (T <= pbpair.first) {
                     _p += ((T * _v) - ((T*T)/(2.0*_Temp)) * _c);
+                    std::cout<<"vec_increase = "<<((T * _v) - ((T*T)/(2.0*_Temp)) * _c).getCoefficients().transpose()<<"\n"<<std::endl;
+                    std::cout<<"_p = "<<_p.getCoefficients().transpose()<<"\n"<<std::endl;
                     _lambda_prev = T;
                     break;
                 } else if (it == 100*n) {
@@ -204,7 +221,7 @@ struct hmc_exponential
                 _lambda_prev = dl * pbpair.first;
                 _p += ((_lambda_prev * _v) - ((_lambda_prev*_lambda_prev)/(2.0*_Temp)) * _c);
                 T -= _lambda_prev;
-                P.compute_reflection(_v, _c, _Temp, _lambda_prev, _update_params);
+                P.compute_reflection(_v, _c, _Temp, _Ac, _lambda_prev, _update_params);
                 it++;
             }
         }
